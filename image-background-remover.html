@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🖼️ 图片背景去除</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            color: white;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d9ff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            color: #888;
+            margin-bottom: 40px;
+        }
+        
+        .upload-area {
+            width: 100%;
+            max-width: 600px;
+            border: 3px dashed #444;
+            border-radius: 20px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.05);
+            margin-bottom: 30px;
+        }
+        
+        .upload-area:hover {
+            border-color: #00d9ff;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .upload-area.dragover {
+            border-color: #a855f7;
+            background: rgba(168,85,247,0.2);
+        }
+        
+        .upload-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        
+        .upload-text {
+            font-size: 1.2rem;
+            color: #ccc;
+        }
+        
+        .upload-hint {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .preview-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .preview-box {
+            text-align: center;
+        }
+        
+        .preview-box h3 {
+            margin-bottom: 15px;
+            color: #aaa;
+            font-size: 1rem;
+        }
+        
+        .preview-img {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><rect fill="%23333" width="20" height="20"/><path d="M0 0h20v20H0z" fill-opacity="0.4"/></svg>');
+        }
+        
+        .preview-img.has-bg {
+            background-image: none;
+        }
+        
+        .download-btn {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, #00d9ff, #a855f7);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 15px;
+        }
+        
+        .download-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .download-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin: 30px 0;
+        }
+        
+        .loading.active {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #333;
+            border-top-color: #00d9ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            margin-top: 15px;
+            color: #888;
+        }
+        
+        .api-key-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid #444;
+            border-radius: 10px;
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .api-key-input:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+        
+        .api-key-input::placeholder {
+            color: #666;
+        }
+        
+        .settings {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+        }
+        
+        .settings-btn {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid #444;
+            border-radius: 10px;
+            color: #888;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .settings-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="settings">
+        <button class="settings-btn" onclick="toggleApiKey()">⚙️ API Key</button>
+    </div>
+    
+    <h1>🖼️ 图片背景去除</h1>
+    <p class="subtitle">一键去除图片背景</p>
+    
+    <div id="apiKeySection" style="display: none;">
+        <input type="password" id="apiKey" class="api-key-input" placeholder="输入 Remove.bg API Key">
+    </div>
+    
+    <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">📁</div>
+        <div class="upload-text">点击或拖拽上传图片</div>
+        <div class="upload-hint">支持 PNG, JPG, WEBP</div>
+    </div>
+    
+    <input type="file" id="fileInput" accept="image/*">
+    
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">正在去除背景...</div>
+    </div>
+    
+    <div class="preview-container" id="previewContainer" style="display: none;">
+        <div class="preview-box">
+            <h3>原图</h3>
+            <img id="originalImg" class="preview-img" src="" alt="Original">
+        </div>
+        <div class="preview-box">
+            <h3>结果</h3>
+            <img id="resultImg" class="preview-img" src="" alt="Result">
+            <a id="downloadBtn" class="download-btn" href="" download="removed-bg.png">⬇️ 下载</a>
+        </div>
+    </div>
+
+    <script>
+        // 从本地存储读取 API Key
+        // 可选：使用自己的 Cloudflare Worker（更安全）
+        const WORKER_URL = ''; // 例如: 'https://your-worker.your-name.workers.dev'
+        
+        let apiKey = localStorage.getItem('removebg_apikey') || '';
+        
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const loading = document.getElementById('loading');
+        const previewContainer = document.getElementById('previewContainer');
+        const originalImg = document.getElementById('originalImg');
+        const resultImg = document.getElementById('resultImg');
+        const downloadBtn = document.getElementById('downloadBtn');
+        
+        // 显示已保存的 API Key
+        if (apiKey) {
+            document.getElementById('apiKey').value = apiKey;
+        }
+        
+        function toggleApiKey() {
+            const section = document.getElementById('apiKeySection');
+            section.style.display = section.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // 保存 API Key
+        document.getElementById('apiKey').addEventListener('change', function(e) {
+            apiKey = e.target.value.trim();
+            localStorage.setItem('removebg_apikey', apiKey);
+        });
+        
+        // 上传区域点击
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        // 拖拽上传
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) processFile(file);
+        });
+        
+        // 文件选择
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) processFile(file);
+        });
+        
+        function processFile(file) {
+            if (!apiKey) {
+                alert('请先输入 Remove.bg API Key！\n免费注册: https://www.remove.bg/api');
+                toggleApiKey();
+                return;
+            }
+            
+            // 显示原图
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                originalImg.src = e.target.result;
+                originalImg.classList.add('has-bg');
+            };
+            reader.readAsDataURL(file);
+            
+            // 上传并处理
+            uploadImage(file);
+        }
+        
+        async function uploadImage(file) {
+            loading.classList.add('active');
+            previewContainer.style.display = 'none';
+            
+            const formData = new FormData();
+            formData.append('image_file', file);
+            
+            try {
+                let response;
+                
+                if (WORKER_URL) {
+                    // 使用自己的 Worker
+                    response = await fetch(WORKER_URL, {
+                        method: 'POST',
+                        body: formData
+                    });
+                } else {
+                    // 直接调用 Remove.bg API
+                    formData.append('size', 'auto');
+                    response = await fetch('https://api.remove.bg/v1.0/removebg', {
+                        method: 'POST',
+                        headers: {
+                            'X-Api-Key': apiKey
+                        },
+                        body: formData
+                    });
+                }
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.errors?.[0]?.title || error.error || '处理失败');
+                }
+                
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                
+                resultImg.src = url;
+                downloadBtn.href = url;
+                
+                previewContainer.style.display = 'flex';
+            } catch (error) {
+                alert('错误: ' + error.message);
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>

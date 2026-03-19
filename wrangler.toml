@@ -1,0 +1,8 @@
+name = "remove-bg-worker"
+main = "index.js"
+compatibility_date = "2023-12-01"
+
+[vars]
+
+# 在 Cloudflare Dashboard 添加 Secrets:
+# wrangler secret put REMOVE_BG_API_KEY
