@@ -245,7 +245,8 @@
     <script>
         // 从本地存储读取 API Key
         // 可选：使用自己的 Cloudflare Worker（更安全）
-        const WORKER_URL = ''; // 例如: 'https://your-worker.your-name.workers.dev'
+        const WORKER_URL = ''; // 已弃用，改用直接 API 调用
+        const REMOVE_BG_API_KEY = '6LwfiPPsgCdKt5NvRjLdgEen';
         
         let apiKey = localStorage.getItem('removebg_apikey') || '';
         
@@ -337,10 +338,11 @@
                 } else {
                     // 直接调用 Remove.bg API
                     formData.append('size', 'auto');
+                    const useApiKey = apiKey || REMOVE_BG_API_KEY;
                     response = await fetch('https://api.remove.bg/v1.0/removebg', {
                         method: 'POST',
                         headers: {
-                            'X-Api-Key': apiKey
+                            'X-Api-Key': useApiKey
                         },
                         body: formData
                     });
