@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🖼️ 图片背景去除</title>
+    <meta name="viewport" content="width: initial-scale=1.0">
+    <title>🖼️ 图片背景去除 - 会员版</title>
     <style>
         * {
             margin: 0;
@@ -57,6 +57,11 @@
         .upload-area.dragover {
             border-color: #a855f7;
             background: rgba(168,85,247,0.2);
+        }
+        
+        .upload-area.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         
         .upload-icon {
@@ -162,27 +167,6 @@
             color: #888;
         }
         
-        .api-key-input {
-            width: 100%;
-            max-width: 400px;
-            padding: 12px 20px;
-            font-size: 1rem;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid #444;
-            border-radius: 10px;
-            color: white;
-            margin-bottom: 20px;
-        }
-        
-        .api-key-input:focus {
-            outline: none;
-            border-color: #00d9ff;
-        }
-        
-        .api-key-input::placeholder {
-            color: #666;
-        }
-        
         .settings {
             position: fixed;
             top: 20px;
@@ -203,18 +187,249 @@
             background: rgba(255,255,255,0.2);
             color: white;
         }
+        
+        /* 登录和用户面板 */
+        .user-panel {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d9ff, #a855f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .user-email {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+        
+        .user-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+        
+        .status-free {
+            background: #666;
+            color: white;
+        }
+        
+        .status-vip {
+            background: linear-gradient(135deg, #f5af17, #f12711);
+            color: white;
+        }
+        
+        .credits {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        .login-btn, .logout-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .login-btn {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: #ccc;
+        }
+        
+        /* 会员套餐 */
+        .pricing {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 30px;
+        }
+        
+        .pricing-title {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+        
+        .pricing-card {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid #444;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pricing-card:hover {
+            border-color: #00d9ff;
+            transform: translateY(-5px);
+        }
+        
+        .pricing-card.current {
+            border-color: #00d9ff;
+            background: rgba(0,217,255,0.1);
+        }
+        
+        .pricing-card.best {
+            border-color: #f5af17;
+            position: relative;
+        }
+        
+        .pricing-card.best::before {
+            content: '🏆 最值';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #f5af17, #f12711);
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+        
+        .plan-name {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .plan-price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00d9ff;
+            margin-bottom: 5px;
+        }
+        
+        .plan-price span {
+            font-size: 0.9rem;
+            color: #888;
+        }
+        
+        .plan-credits {
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+        
+        .buy-btn {
+            margin-top: 15px;
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #00d9ff, #a855f7);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .buy-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .error-msg {
+            color: #ff6b6b;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
     <div class="settings">
-        <button class="settings-btn" onclick="toggleApiKey()">⚙️ API Key</button>
+        <button class="settings-btn" onclick="toggleSettings()">⚙️ 设置</button>
     </div>
     
     <h1>🖼️ 图片背景去除</h1>
     <p class="subtitle">一键去除图片背景</p>
     
-    <div id="apiKeySection" style="display: none;">
-        <input type="password" id="apiKey" class="api-key-input" placeholder="输入 Remove.bg API Key">
+    <!-- 用户面板 -->
+    <div class="user-panel" id="userPanel">
+        <!-- 未登录 -->
+        <div id="loginSection">
+            <p style="color: #aaa; margin-bottom: 15px;">登录后使用服务</p>
+            <button class="login-btn" id="googleLoginBtn">🔵 Google 登录</button>
+        </div>
+        
+        <!-- 已登录 -->
+        <div id="userSection" class="hidden">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">👤</div>
+                <div>
+                    <div class="user-email" id="userEmail"></div>
+                </div>
+            </div>
+            <div class="user-status" id="userStatus">免费用户</div>
+            <div class="credits" id="creditsInfo">剩余次数: 3</div>
+            <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+    </div>
+    
+    <!-- 会员套餐 -->
+    <div class="pricing" id="pricingSection">
+        <h3 class="pricing-title">💎 升级会员</h3>
+        <div class="pricing-grid">
+            <div class="pricing-card" id="planFree">
+                <div class="plan-name">免费版</div>
+                <div class="plan-price">¥0</div>
+                <div class="plan-credits">3次</div>
+            </div>
+            <div class="pricing-card" id="planMonthly">
+                <div class="plan-name">月卡</div>
+                <div class="plan-price">¥9.9<span>/月</span></div>
+                <div class="plan-credits">100次</div>
+                <button class="buy-btn" onclick="buyPlan('monthly')">购买</button>
+            </div>
+            <div class="pricing-card best" id="planQuarterly">
+                <div class="plan-name">季卡</div>
+                <div class="plan-price">¥19.9<span>/季</span></div>
+                <div class="plan-credits">300次</div>
+                <button class="buy-btn" onclick="buyPlan('quarterly')">购买</button>
+            </div>
+            <div class="pricing-card" id="planYearly">
+                <div class="plan-name">年卡</div>
+                <div class="plan-price">¥49.9<span>/年</span></div>
+                <div class="plan-credits">无限次</div>
+                <button class="buy-btn" onclick="buyPlan('yearly')">购买</button>
+            </div>
+        </div>
     </div>
     
     <div class="upload-area" id="uploadArea">
@@ -230,7 +445,9 @@
         <div class="loading-text">正在去除背景...</div>
     </div>
     
-    <div class="preview-container" id="previewContainer" style="display: none;">
+    <div class="error-msg" id="errorMsg"></div>
+    
+    <div class="preview-container" id="previewContainer">
         <div class="preview-box">
             <h3>原图</h3>
             <img id="originalImg" class="preview-img" src="" alt="Original">
@@ -243,13 +460,190 @@
     </div>
 
     <script>
-        // 从本地存储读取 API Key
-        // 可选：使用自己的 Cloudflare Worker（更安全）
-        const WORKER_URL = ''; // 已弃用，改用直接 API 调用
-        const REMOVE_BG_API_KEY = 'ccfcnow7cLP71xBfG4cjv2Zzah';
+        // 免费用户次数限制
+        const MAX_FREE_CREDITS = 3;
         
-        let apiKey = localStorage.getItem('removebg_apikey') || '';
+        // 套餐配置
+        const PLANS = {
+            free: { name: '免费版', credits: 3, price: 0 },
+            monthly: { name: '月卡', credits: 100, price: 9.9 },
+            quarterly: { name: '季卡', credits: 300, price: 19.9 },
+            yearly: { name: '年卡', credits: -1, price: 49.9 } // -1 表示无限
+        };
         
+        // 用户数据
+        let currentUser = null;
+        let tokenClient = null;
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initGoogleAuth();
+            loadUserFromStorage();
+        });
+        
+        // 初始化 Google 登录
+        function initGoogleAuth() {
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: 'openid email profile',
+                callback: handleCredentialResponse
+            });
+            
+            document.getElementById('googleLoginBtn').onclick = () => {
+                tokenClient.requestAccessToken();
+            };
+        }
+        
+        // 处理 Google 登录回调
+        async function handleCredentialResponse(response) {
+            if (response.access_token) {
+                try {
+                    // 获取用户信息
+                    const userInfo = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+                        headers: { Authorization: 'Bearer ' + response.access_token }
+                    }).then(r => r.json());
+                    
+                    // 创建或获取用户（这里用 localStorage 模拟）
+                    currentUser = {
+                        email: userInfo.email,
+                        name: userInfo.name,
+                        picture: userInfo.picture,
+                        tier: 'free',
+                        used: 0,
+                        accessToken: response.access_token
+                    };
+                    
+                    saveUser();
+                    updateUI();
+                } catch (e) {
+                    showError('登录失败: ' + e.message);
+                }
+            } else if (response.error) {
+                showError('登录失败: ' + (response.error_description || response.error));
+            }
+        }
+        
+        // 从 localStorage 加载用户
+        function loadUserFromStorage() {
+            const saved = localStorage.getItem('bg_user');
+            if (saved) {
+                try {
+                    currentUser = JSON.parse(saved);
+                    updateUI();
+                } catch (e) {
+                    localStorage.removeItem('bg_user');
+                }
+            }
+        }
+        
+        // 保存用户到 localStorage
+        function saveUser() {
+            if (currentUser) {
+                // 不保存 accessToken 到 localStorage
+                const toSave = { ...currentUser };
+                delete toSave.accessToken;
+                localStorage.setItem('bg_user', JSON.stringify(toSave));
+            }
+        }
+        
+        // 更新 UI
+        function updateUI() {
+            const loginSection = document.getElementById('loginSection');
+            const userSection = document.getElementById('userSection');
+            const pricingSection = document.getElementById('pricingSection');
+            const uploadArea = document.getElementById('uploadArea');
+            
+            if (!currentUser) {
+                // 未登录
+                loginSection.classList.remove('hidden');
+                userSection.classList.add('hidden');
+                pricingSection.classList.add('hidden');
+                uploadArea.classList.add('disabled');
+                return;
+            }
+            
+            // 已登录
+            loginSection.classList.add('hidden');
+            userSection.classList.remove('hidden');
+            pricingSection.classList.remove('hidden');
+            uploadArea.classList.remove('disabled');
+            
+            // 显示用户信息
+            document.getElementById('userAvatar').textContent = currentUser.picture ? '📷' : '👤';
+            document.getElementById('userEmail').textContent = currentUser.email;
+            
+            // 显示用户状态
+            const statusEl = document.getElementById('userStatus');
+            const creditsEl = document.getElementById('creditsInfo');
+            
+            if (currentUser.tier === 'vip') {
+                statusEl.textContent = 'VIP会员';
+                statusEl.className = 'user-status status-vip';
+                creditsEl.textContent = '剩余: 无限次';
+            } else {
+                statusEl.textContent = '免费用户';
+                statusEl.className = 'user-status status-free';
+                const left = MAX_FREE_CREDITS - (currentUser.used || 0);
+                creditsEl.textContent = `剩余: ${left}次`;
+            }
+            
+            // 更新套餐选中状态
+            document.querySelectorAll('.pricing-card').forEach(card => card.classList.remove('current'));
+            if (currentUser.tier === 'vip') {
+                document.getElementById('planYearly').classList.add('current');
+            } else {
+                document.getElementById('planFree').classList.add('current');
+            }
+        }
+        
+        // 退出登录
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('bg_user');
+            if (google.accounts.oauth2) {
+                google.accounts.oauth2.revoke();
+            }
+            updateUI();
+            document.getElementById('fileInput').value = '';
+            document.getElementById('previewContainer').style.display = 'none';
+        }
+        
+        // 购买套餐（模拟）
+        function buyPlan(plan) {
+            if (!currentUser) {
+                showError('请先登录');
+                return;
+            }
+            
+            const confirmMsg = {
+                monthly: `确认购买月卡 ¥9.9 (100次)?`,
+                quarterly: `确认购买季卡 ¥19.9 (300次)?`,
+                yearly: `确认购买年卡 ¥49.9 (无限次)?`
+            };
+            
+            if (confirm(confirmMsg[plan])) {
+                // 这里应该调用支付接口，简化处理直接升级
+                currentUser.tier = 'vip';
+                currentUser.plan = plan;
+                saveUser();
+                updateUI();
+                alert('购买成功！');
+            }
+        }
+        
+        // 显示错误
+        function showError(msg) {
+            const el = document.getElementById('errorMsg');
+            el.textContent = msg;
+            setTimeout(() => el.textContent = '', 5000);
+        }
+        
+        // 设置面板
+        function toggleSettings() {
+            alert('设置功能开发中...');
+        }
+        
+        // 上传区域点击
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const loading = document.getElementById('loading');
@@ -258,24 +652,13 @@
         const resultImg = document.getElementById('resultImg');
         const downloadBtn = document.getElementById('downloadBtn');
         
-        // 显示已保存的 API Key
-        if (apiKey) {
-            document.getElementById('apiKey').value = apiKey;
-        }
-        
-        function toggleApiKey() {
-            const section = document.getElementById('apiKeySection');
-            section.style.display = section.style.display === 'none' ? 'block' : 'none';
-        }
-        
-        // 保存 API Key
-        document.getElementById('apiKey').addEventListener('change', function(e) {
-            apiKey = e.target.value.trim();
-            localStorage.setItem('removebg_apikey', apiKey);
+        uploadArea.addEventListener('click', () => {
+            if (!currentUser) {
+                showError('请先登录');
+                return;
+            }
+            fileInput.click();
         });
-        
-        // 上传区域点击
-        uploadArea.addEventListener('click', () => fileInput.click());
         
         // 拖拽上传
         uploadArea.addEventListener('dragover', (e) => {
@@ -290,6 +673,10 @@
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
             uploadArea.classList.remove('dragover');
+            if (!currentUser) {
+                showError('请先登录');
+                return;
+            }
             const file = e.dataTransfer.files[0];
             if (file) processFile(file);
         });
@@ -301,9 +688,17 @@
         });
         
         function processFile(file) {
-            if (!apiKey) {
-                alert('请先输入 Remove.bg API Key！\n免费注册: https://www.remove.bg/api');
-                toggleApiKey();
+            if (!currentUser) {
+                showError('请先登录');
+                return;
+            }
+            
+            // 检查次数
+            const used = currentUser.used || 0;
+            const left = currentUser.tier === 'vip' ? Infinity : (MAX_FREE_CREDITS - used);
+            
+            if (left <= 0) {
+                showError('免费次数已用完，请升级会员');
                 return;
             }
             
@@ -325,28 +720,11 @@
             
             const formData = new FormData();
             formData.append('image_file', file);
+            formData.append('size', 'auto');
             
             try {
-                let response;
-                
-                if (WORKER_URL) {
-                    // 使用自己的 Worker
-                    response = await fetch(WORKER_URL, {
-                        method: 'POST',
-                        body: formData
-                    });
-                } else {
-                    // 直接调用 Remove.bg API
-                    formData.append('size', 'auto');
-                    const useApiKey = apiKey || REMOVE_BG_API_KEY;
-                    response = await fetch('https://api.remove.bg/v1.0/removebg', {
-                        method: 'POST',
-                        headers: {
-                            'X-Api-Key': useApiKey
-                        },
-                        body: formData
-                    });
-                }
+                });
+>>>>>>> 5a8be8e (feat: 添加会员定价方案 (方案一))
                 
                 if (!response.ok) {
                     const error = await response.json();
@@ -360,12 +738,21 @@
                 downloadBtn.href = url;
                 
                 previewContainer.style.display = 'flex';
+                
+                // 更新次数
+                if (currentUser.tier !== 'vip') {
+                    currentUser.used = (currentUser.used || 0) + 1;
+                    saveUser();
+                    updateUI();
+                }
             } catch (error) {
-                alert('错误: ' + error.message);
+                showError('错误: ' + error.message);
             } finally {
                 loading.classList.remove('active');
             }
         }
     </script>
+    
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </body>
 </html>
